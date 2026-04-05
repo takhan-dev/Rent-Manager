@@ -76,5 +76,6 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
 export type Contractor = typeof contractors.$inferSelect;
+export type InsertContractor = z.infer<typeof insertContractorSchema>;
 export type MaintenanceRequest = typeof maintenanceRequests.$inferSelect;
 export type InsertMaintenanceRequest = z.infer<typeof insertMaintenanceRequestSchema>;

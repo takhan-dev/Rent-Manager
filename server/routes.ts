@@ -25,7 +25,7 @@ export async function registerRoutes(
       }),
       resave: false,
       saveUninitialized: false,
-      secret: "keyboard cat",
+      secret: process.env.SESSION_SECRET || "keyboard cat",
     })
   );
 
@@ -195,28 +195,25 @@ export async function registerRoutes(
     });
   }
 
-  if (!(await storage.getUserByUsername("tenant@example.com"))) {
+  let demoTenantUser = await storage.getUserByUsername("tenant@example.com");
+  if (!demoTenantUser) {
     const hashed = await hashPassword("tenant123");
-    const user = await storage.createUser({
+    demoTenantUser = await storage.createUser({
       username: "tenant@example.com",
       password: hashed,
       role: "tenant",
       name: "Tenant Tim"
     });
-    // Update the auto-created tenant profile
-    const tenant = await storage.getTenantByUserId(user.id);
-    if (tenant) {
-      // Direct DB update for seed data would be better but we don't have updateTenant method exposed fully
-      // But we can use direct db call here or add method. 
-      // Actually storage.createTenant was called in register, but here we manually created user.
-      // So we must manually create tenant profile.
-      await storage.createTenant({
-        userId: user.id,
-        unitNumber: "101",
-        rentAmount: 1500,
-        isPaid: false
-      });
-    }
+  }
+  // Always ensure the demo tenant has a tenant profile
+  const demoTenantProfile = await storage.getTenantByUserId(demoTenantUser.id);
+  if (!demoTenantProfile) {
+    await storage.createTenant({
+      userId: demoTenantUser.id,
+      unitNumber: "101",
+      rentAmount: 1500,
+      isPaid: false
+    });
   }
 
   return httpServer;

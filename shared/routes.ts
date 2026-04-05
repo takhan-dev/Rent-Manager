@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { insertUserSchema, insertMaintenanceRequestSchema, users, tenants, maintenanceRequests, contractors } from './schema';
 
+export type { InsertUser } from './schema';
+export type { InsertMaintenanceRequest } from './schema';
+
 export const errorSchemas = {
   validation: z.object({
     message: z.string(),
