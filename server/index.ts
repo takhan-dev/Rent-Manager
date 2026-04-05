@@ -80,19 +80,15 @@ app.use((req, res, next) => {
     await setupVite(httpServer, app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
+  // PORT: Replit expects a single exposed port. Local dev uses 127.0.0.1 so the
+  // server is not wide-open on your machine; Replit uses 0.0.0.0 for inbound
+  // proxy access. reusePort is omitted — it is not supported on Windows and
+  // throws "operation not supported on socket".
   const port = parseInt(process.env.PORT || "5000", 10);
-  httpServer.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`serving on port ${port}`);
-    },
-  );
+  const isReplit = process.env.REPL_ID !== undefined;
+  const host = isReplit ? "0.0.0.0" : "127.0.0.1";
+
+  httpServer.listen({ port, host }, () => {
+    log(`serving on http://${host}:${port}`);
+  });
 })();
